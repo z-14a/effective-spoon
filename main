@@ -1,0 +1,184 @@
+from random import * #Everything is imported from the random module
+
+def numcheck(num):
+    num=str(num)
+    if num.isdigit()==False or (int(num)>36 or int(num)<0):
+        while True: #Continuous loop until flow is changed by a break
+            try: #Will attempt following code but instead of error messages, a procedure is followed on what to do - ask for another input
+                num = int(input("Please enter a single integer 0-36: "))
+                if num < 0 or num > 36:
+                    raise ValueError #flow changed to ValueError to print invalid message if number isn't in the range
+                break #Exits while loop if the input is in the range and is a valid integer
+            except ValueError: #If the number isnt an integer or in the range above, it will give a value error which is resolved with a messsage
+                print("Invalid Input.")
+    return num #Passes validated number back as result
+
+def make_a_Stake():
+    if credit == 0:
+        return False
+    else:
+        choice_stake=""
+        while choice_stake.upper() != "Y" or choice_stake.upper() != "X":
+            choice_stake=input("Would you like to make a stake. Press Y to make a stake, X to proceed without making a stake: ")
+            if choice_stake.upper() == "Y":
+                return True
+            elif choice_stake.upper() =="X":
+                return False
+            else:
+                print("Invalid Input.")
+            
+def stake_Integer():
+    num_input=""
+    if num_input.isdigit()==False or (int(num_input)<0 or int(num_input)>credit):
+        while True: #Continuous loop until flow is changed by a break
+            try: #Will attempt following code but instead of error messages, a procedure is followed on what to do - ask for another input
+                print("Please enter a single integer between 1 and" , credit)
+                num_input = int(input("Please enter your stake: "))
+                if num_input < 1 or num_input > credit:
+                    raise ValueError #flow changed to ValueError to print invalid message if number isn't in the range
+                break #Exits while loop if the input is in the range and is a valid integer
+            except ValueError: #If the number isnt an integer or in the range above, it will give a value error which is resolved with a messsage
+                print("Invalid Input.")
+    return num_input #Passes validated number back as result
+
+def stake_logic_Start():
+    global choice
+    choice = make_a_Stake()
+    if choice == True:
+        stake = stake_Integer()
+    else:
+        stake = 0
+    return stake
+
+def stake_Result(game, result, stake):
+    if stake == 0:
+        return credit
+    else:
+        if result == 1:
+            if game == 1:
+                credit = credit + (36 * stake)
+            elif game == 2 or game == 3 or game == 4 or game == 5 or game == 6 or game == 7:
+                credit = credit + stake
+            else:
+                credit = credit + (2 * stake)
+        else:
+            credit = credit - stake
+        return credit
+
+def stake_logic_Result(game, result, stake):
+    if choice == True:
+        newBalance = stake_Result(game, result, stake)
+        return newBalance
+    else:
+        return credit
+
+    
+odds = [(0,9,9,9,9), (1,0,0,1,"L"), (2,1,0,0,"M"), (3,0,0,1,"R"),
+    (4,1,0,0,"L"), (5,0,0,1,"M"), (6,1,0,0,"R"), (7,0,0,1,"L"),
+    (8,1,0,0,"M"), (9,0,0,1,"R"), (10,1,0,0,"L"), (11,0,0,0,"M"),
+    (12,1,0,1,"R"), (13,0,0,0,"L"), (14,1,0,1,"M"), (15,0,0,0,"R"),
+    (16,1,0,1,"L"), (17,0,0,0,"M"), (18,1,0,1,"R"), (19,0,1,1,"L"),
+    (20,1,1,0,"M"), (21,0,1,1,"R"), (22,1,1,0,"L"), (23,0,1,1,"M"),
+    (24,1,1,0,"R"), (25,0,1,1,"L"), (26,1,1,0,"M"), (27,0,1,1,"R"),
+    (28,1,1,0,"L"), (29,0,1,0,"M"), (30,1,1,1,"R"), (31,0,1,0,"L"),
+    (32,1,1,1,"M"), (33,0,1,0,"R"), (34,1,1,1,"L"), (35,0,1,0,"M"),
+    (36,1,1,1,"R")]
+#First Element-Actual Number on roulette board
+#Second Element-Is the number even or odd, 1 if EVEN, 0 if ODD
+#Third Element-Is the number in the low 1-18 or high 19-36, 1 if in the HIGH, 0 if the number is in the LOW
+#Fourth Element-Is the number a red or black, 1 if the number is RED, 0 if the number is BLACK
+global credit
+credit = 20
+while credit > 0: #loop will run continuously unless a break is used to quit or credits is 0
+    rand_Outcome = choice(odds)
+    print("\nOptions")
+    print("1 - Single Number")
+    print("2 - Odd")
+    print("3 - Even")
+    print("4 - Low")
+    print("5 - High")
+    print("6 - Black")
+    print("7 - Red")
+    print("8 - Columns")
+    print("X - exit")
+    print() #List of Options for player to choose from
+
+    menu_Choice = input("Please chooose your option: ") #Player must choose a menu option via a number input(Not Validated)
+    if menu_Choice == "1": #Main logic statement if to compare user inputs for their menu choice, 1 is single number 
+        stake = stake_logic_Start()
+        bet = input("Please choose your number: ") #Player must select a number to bet on
+        bet=numcheck(bet)
+        print("\nThe number was: " , rand_Outcome[0])
+        if int(bet) == rand_Outcome[0]:
+            print("Your a winner!") #If the input number matches the first element of the randomly chosen outcome the player wins i.e.: the actual number is b[0]
+            stake_logic_Result(1, 1, stake)
+        else:
+            print("Unlucky!")
+            stake_logic_Result(1, 0, stake)
+            
+    elif menu_Choice == "2": #Odd Option
+        stake = stake_logic_Start()
+        if rand_Outcome[1] == 0: #If the second element in the randomly chosen outcome is 0, the number is odd, if it is 1 it is even (0 always loses)
+            print("The number", rand_Outcome[0], "has come up. Your a winner!") #Informs the user of the number that was chosen randomly and if they won or lost
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "3": #Even Option
+        stake = stake_logic_Start()
+        if rand_Outcome[1] == 1: #If the second element in the randomly chosen outcome is 0, the number is odd, if it is 1 it is even (0 always loses)
+            print("The number", rand_Outcome[0], "has come up. Your a winner!")
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "4": #Low Option
+        stake = stake_logic_Start()
+        if rand_Outcome[2] == 0: #If the second element in the outcome is 0, the number ranges between 1-18 (low), if it is 1, the number ranges 19-36 (high)
+            print("The number", rand_Outcome[0], "has come up. Your a winner!") #Informs the user of the number that was chosen whivh is the first element of the outcome
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "5": #High Option
+        stake = stake_logic_Start()
+        if rand_Outcome[2] == 1: #If the second element in the outcome is 0, the number ranges between 1-18 (low), if it is 1, the number ranges 19-36 (high)
+            print("The number", rand_Outcome[0], "has come up. Your a winner!")
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "6": #Black Option
+        stake = stake_logic_Start()
+        if rand_Outcome[3] == 0: #If the third element in the randomly chosen outcome is 0, the number is a black on the roulette board, if 1 it is red on the board
+            print("The number", rand_Outcome[0], "has come up. Your a winner!")
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "7": #Red Option
+        stake = stake_logic_Start()
+        if rand_Outcome[3] == 0: #If the third element in the randomly chosen outcome is 0, the number is a black on the roulette board, if 1 it is red on the board
+            print("The number", rand_Outcome[0], "has come up. Your a winner!")
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")
+
+    elif menu_Choice == "8": #Columns option
+        stake = stake_logic_Start()
+        bet=input("Please choose a column L,M,R: ") #Player chooses column
+        columns=["L","M","R"] #Array containing all possible columns
+        while bet.upper() not in columns: #Validates entry by checking if the capitalised entry matches any of the choices in columns
+            print("Invalid Input. Please only enter L,M or R") #If invalid entry, this will loop until a valid option is entered
+            bet=input("Please choose a column L,M,R: ")
+        if bet.upper() == rand_Outcome[4]: #Compares the column entered with randomly chosen outcome array element 4 which contains the column
+            print("The number", rand_Outcome[0], "has come up. Your a winner!")
+        else:
+            print("The number", rand_Outcome[0], "has come up. Unlucky!")   #Message to inform user if they win  
+
+    elif menu_Choice.upper() == "X": #Quit Option
+        print("Goodbye!!")
+        break #break allows the flow of the program to change as while loop is now exited
+
+    else:
+        print("Invalid option!")
+            
+print()
+
+
+            
+
